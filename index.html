@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GradeViz - Grade Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1 id="page-title">Grade Dashboard</h1>
+            <div class="header-controls">
+                <button id="scale-toggle" class="btn">Switch to 4.0 Scale</button>
+                <button id="lang-toggle" class="btn">한글</button>
+            </div>
+        </header>
+
+        <div class="summary-cards">
+            <div class="card animate-fade-up delay-100">
+                <h3 id="label-total-credits">Total Credits</h3>
+                <p class="value" id="val-total-credits">-</p>
+            </div>
+            <div class="card animate-fade-up delay-200">
+                <h3 id="label-overall-gpa">Overall GPA</h3>
+                <p class="value" id="val-overall-gpa">-</p>
+            </div>
+            <div class="card animate-fade-up delay-300">
+                <h3 id="label-major-gpa">Major GPA</h3>
+                <p class="value" id="val-major-gpa">-</p>
+            </div>
+            <div class="card animate-fade-up delay-300" id="card-converted-score">
+                <h3 id="label-converted-score">Converted Score</h3>
+                <p class="value" id="val-converted-score">-</p>
+            </div>
+        </div>
+
+        <div class="charts-container">
+            <div class="card chart-card full-width animate-fade-up delay-100">
+                <h3 id="label-gpa-trend">Semester GPA Graph</h3>
+                <div id="line-chart"></div>
+            </div>
+            <div class="card chart-card animate-fade-up delay-200">
+                <h3 id="label-grade-dist">Grade Distribution</h3>
+                <div id="pie-chart"></div>
+            </div>
+            <div class="card chart-card animate-fade-up delay-200">
+                <h3 id="label-code-dist">Course Code Distribution</h3>
+                <div id="code-chart"></div>
+            </div>
+            <div class="card chart-card full-width animate-fade-up delay-300">
+                <h3 id="label-credits-sem">Credits by Semester</h3>
+                <div id="bar-chart"></div>
+            </div>
+        </div>
+
+        <div class="card full-width animate-fade-up delay-300" style="margin-top: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 id="label-course-list" style="margin: 0;">Course List</h3>
+                <div class="filters-container">
+                    <select id="filter-semester" class="filter-select">
+                        <option value="all">Check Semesters...</option>
+                    </select>
+                    <select id="filter-category" class="filter-select">
+                        <option value="all">All Categories</option>
+                    </select>
+                    <button id="btn-reset-filters" class="btn btn-reset">Reset</button>
+                    <input type="text" id="course-search" placeholder="Search courses..." class="search-input">
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="course-table">
+                    <thead>
+                        <tr>
+                            <th data-sort="semester" id="th-semester">Semester ↕</th>
+                            <th data-sort="code" id="th-code">Code ↕</th>
+                            <th data-sort="title" id="th-title">Course Title ↕</th>
+                            <th data-sort="category" id="th-category">Category ↕</th>
+                            <th data-sort="credits" id="th-credits">Credits ↕</th>
+                            <th data-sort="grade" id="th-grade">Grade ↕</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

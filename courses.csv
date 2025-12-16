@@ -1,0 +1,57 @@
+﻿Course Code,Course Title (Korean),Course Title (English),Grade,Credits,Semester,Category
+CHM101,일반화학 I,General Chemistry I,A0,3,2022 1st,Basic
+CHM105,일반화학실험 I,General Chemistry Lab I,S,1,2022 1st,Basic
+ITP107,기초 인공지능 프로그래밍 I,Introduction to AI Programming I,S,3,2022 1st,Basic
+ITP117,기초 인공지능 프로그래밍 II,Introduction to AI Programming II,A+,3,2022 1st,Basic
+MTH111,미적분학 I,Calculus I,A+,3,2022 1st,Basic
+PHY101,일반물리학 I,General Physics I,A-,3,2022 1st,Basic
+PHY107,일반물리학실험 I,General Physics Lab I,S,1,2022 1st,Basic
+ULP413,리더십_CA 멘토십(멘티),Leadership_CA Mentorship(Mentee),S,1 AU,2022 1st,Leadership Program
+ITP111,확률과 랜덤 프로세스,Probability and Random Process,A+,3,2022 2nd,Basic
+MTH112,미적분학 II,Calculus II,A+,3,2022 2nd,Basic
+MTH203,응용선형대수,Applied Linear Algebra,A0,3,2022 2nd,Basic
+MTH211,통계학,Statistics,A0,3,2022 2nd,Basic
+SLA380,인류학 특강,Topics in Anthropology,A0,3,2022 2nd,Liberal Arts
+SLA461,과학철학,Philosophy of Science,A+,3,2022 2nd,Liberal Arts
+UNI111,컴퓨터공학 소개,Introduction to Computer Science and Engineering,S,1,2022 2nd,Basic
+UNI113,현대수학입문,Introduction to Modern Mathematics,S,1,2022 2nd,Basic
+LNG201,중국어 I,Chinese I,A+,2,2022 Summer,Liberal Arts
+CSE241,고급 프로그래밍,Advanced Programming,A+,3,2023 1st,Major
+ENG110,영어 듣기&말하기(중급),English Listening&Speaking(Intermediate),S,2,2023 1st,Liberal Arts
+MTH201,미분방정식,Differential Equations,A+,3,2023 1st,Basic
+MTH210,머신러닝의 수학적 원리,Mathematical Foundations of Machine Learning,A0,3,2023 1st,Minor
+MTH251,해석학 I,Mathematical Analysis I,B0,3,2023 1st,Minor
+SLA262,종교철학,Philosophy of Religion,A+,3,2023 1st,Liberal Arts
+SLA361,형이상학,Metaphysics,A+,3,2023 1st,Liberal Arts
+CSE221,데이터구조,Data Structures,A0,3,2023 2nd,Major
+CSE271,프로그래밍언어,Principles of Programming Languages,A-,3,2023 2nd,Major
+ITP112,이산수학,Discrete Mathematics,A+,3,2023 2nd,Basic
+MTH204,선형대수학,Linear Algebra,A-,3,2023 2nd,Minor
+MTH230,집합론,Set theory,A-,3,2023 2nd,Minor
+MTH321,수치해석학,Numerical Analysis,A0,3,2023 2nd,Minor
+ULP403,리더십_지역탐방,Leadership_Local Visits,S,1 AU,2023 2nd,Leadership Program
+ULP418,리더십_정신건강 I,Leadership_Mental Health I,S,1 AU,2023 2nd,Leadership Program
+ULP425,리더십_퍼머컬쳐,Leadership_Permaculture,S,1 AU,2023 2nd,Leadership Program
+ENG113,영어 읽기&쓰기(중급),English Reading&Writing(Intermediate),S,2,2023 Summer,Liberal Arts
+BIO101,일반생물,General Biology,A0,3,2024 1st,Basic
+CSE251,시스템 프로그래밍,System Programming,A+,3,2024 1st,Major
+CSE331,알고리즘,Intro to Algorithms,B+,3,2024 1st,Major
+CSE333,인간-컴퓨터 상호작용 개론,Introduction to Human Computer Interaction,A+,3,2024 1st,Major
+CSE364,소프트웨어공학,Software Engineering,A-,3,2024 1st,Major
+ITR310,인턴십(연구),Internship(Research),S,3,2024 1st,Internship
+SLA263,철학의 근본문제,Fundamental Issues of Philosophy,A+,3,2024 1st,Liberal Arts
+CSE261,컴퓨터구조,Computer Architecture,A+,3,2024 2nd,Major
+CSE332,계산이론,Theory of Computation,A+,3,2024 2nd,Major
+CSE362,인공지능,Artificial Intelligence,A0,3,2024 2nd,Major
+CSE472,컴퓨터 비전,Computer Vision,A+,3,2024 2nd,Major
+ITR310,인턴십(연구),Internship(Research),S,3,2024 2nd,Internship
+ITR310,인턴십(연구),Internship(Research),S,3,2024 Summer,Internship
+ULP601,리더십_사회봉사 1,Leadership_Volunteer work 1,S,1 AU,2024 Winter,Leadership Program
+ULP602,리더십_사회봉사 2,Leadership_Volunteer work 2,S,1 AU,2024 Winter,Leadership Program
+CSE311,운영체제,Operating Systems,A+,3,2025 1st,Major
+CSE467,컴퓨터 보안,Computer Security,A0,3,2025 1st,Major
+CSE468,정보시각화 기술,Information Visualization,A+,3,2025 1st,Major
+SLA362,윤리학,Ethics,A+,3,2025 1st,Liberal Arts
+MTH351,위상수학,General Topology,A+,3,2025 2nd,Minor
+CSE403,딥 러닝,Deep Learning,A+,3,2025 2nd,Major
+CSE401,졸업연구,Research in Computer Science and Engineering,S,3,2025 2nd,Major
