@@ -1,6 +1,6 @@
 # GradeViz - Grade Dashboard
 
-[BLINK_GITHUB_ACTIONS](LINK_GITHUB_ACTIONS)
+GradeViz website: <a href="https://khgwak.github.io/GradeViz" target="_blank">https://khgwak.github.io/GradeViz</a>
 
 ![GradeViz Teaser](assets/GradeViz_teaser.JPG)
 
@@ -30,4 +30,5 @@ To use this dashboard for your own academic records, simply modify `courses.csv`
 ## Tech Stack
 
 - **Core**: HTML5, CSS3, Vanilla JavaScript (ES6+)
+
 - **Visualization**: D3.js (v7)
