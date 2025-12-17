@@ -19,7 +19,7 @@
         <header>
             <h1 id="page-title">Grade Dashboard</h1>
             <div class="header-controls">
-                <button id="scale-toggle" class="btn">Switch to 4.0 Scale</button>
+                <button id="scale-toggle" class="btn"></button>
                 <button id="lang-toggle" class="btn">한글</button>
             </div>
         </header>
@@ -67,15 +67,29 @@
                 <h3 id="label-course-list" style="margin: 0;">Course List</h3>
                 <div class="filters-container">
                     <select id="filter-semester" class="filter-select">
-                        <option value="all">Check Semesters...</option>
                     </select>
                     <select id="filter-category" class="filter-select">
-                        <option value="all">All Categories</option>
                     </select>
                     <button id="btn-reset-filters" class="btn btn-reset">Reset</button>
                     <input type="text" id="course-search" placeholder="Search courses..." class="search-input">
                 </div>
             </div>
+
+            <div id="filtered-summary-container" class="filtered-summary">
+                <div class="filtered-stat-item">
+                    <span class="fs-label" id="fs-label-credits">Filtered Credits</span>
+                    <span class="fs-value" id="fs-val-credits">-</span>
+                </div>
+                <div class="filtered-stat-item">
+                    <span class="fs-label" id="fs-label-gpa">Filtered GPA</span>
+                    <span class="fs-value" id="fs-val-gpa">-</span>
+                </div>
+                <div class="filtered-stat-item">
+                    <span class="fs-label" id="fs-label-major">Filtered Major GPA</span>
+                    <span class="fs-value" id="fs-val-major">-</span>
+                </div>
+            </div>
+
             <div class="table-container">
                 <table id="course-table">
                     <thead>

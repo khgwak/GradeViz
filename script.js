@@ -31,7 +31,14 @@ const UI_TEXT = {
         },
         legendHint: "Click to focus",
         filterHint: "Click to filter table",
-        noResults: "No courses found matching your criteria."
+        noResults: "No courses found matching your criteria.",
+        filteredStats: {
+            credits: "Filtered Credits",
+            gpa: "Filtered GPA",
+            majorGpa: "Filtered Major GPA"
+        },
+        scaleToggle40: "Switch to 4.0 Scale",
+        scaleToggle43: "Switch to 4.3 Scale"
     },
     ko: {
         title: "성적 대시보드",
@@ -65,7 +72,14 @@ const UI_TEXT = {
         },
         legendHint: "클릭하여 이 그래프만 강조",
         filterHint: "클릭하여 테이블 필터링",
-        noResults: "조건에 맞는 강의가 없습니다."
+        noResults: "조건에 맞는 강의가 없습니다.",
+        filteredStats: {
+            credits: "필터된 이수학점",
+            gpa: "필터된 평점평균",
+            majorGpa: "필터된 전공 평점평균"
+        },
+        scaleToggle40: "4.0 만점으로 전환",
+        scaleToggle43: "4.3 만점으로 전환"
     }
 };
 
@@ -121,6 +135,9 @@ const CATEGORY_KO = {
     "Other": "기타"
 };
 
+const CONVERSION_BASE = 57;
+const CONVERSION_SLOPE = 10;
+
 function generateGradientColors(count) {
     if (count <= 0) return [];
     if (count === 1) return [CHART_COLORS.major];
@@ -134,6 +151,10 @@ function generateGradientColors(count) {
         colors.push(interpolator(i / (count - 1)));
     }
     return colors;
+}
+
+function getIsMobile() {
+    return document.body.clientWidth < 768;
 }
 
 function resetFilters(except = null) {
@@ -251,9 +272,12 @@ function populateSemesterFilter() {
     sortSemesters(uniqueSemesters);
 
     const select = document.getElementById('filter-semester');
-    const firstOption = select.options[0];
     select.innerHTML = '';
-    select.appendChild(firstOption);
+
+    const allOption = document.createElement('option');
+    allOption.value = 'all';
+    allOption.text = UI_TEXT[currentLanguage].filters.allSemesters;
+    select.appendChild(allOption);
 
     uniqueSemesters.forEach(semester => {
         const option = document.createElement('option');
@@ -269,9 +293,14 @@ function populateCategoryFilter() {
     const select = document.getElementById('filter-category');
     if (!select) return;
 
-    const firstOption = select.options[0];
+
+
     select.innerHTML = '';
-    select.appendChild(firstOption);
+
+    const allOption = document.createElement('option');
+    allOption.value = 'all';
+    allOption.text = UI_TEXT[currentLanguage].filters.allCategories;
+    select.appendChild(allOption);
 
     uniqueCategories.forEach(category => {
         const option = document.createElement('option');
@@ -297,11 +326,10 @@ function toggleLanguage() {
 function toggleGpaScale() {
     if (gpaScale === '4.3') {
         gpaScale = '4.0';
-        document.getElementById('scale-toggle').innerText = "Switch to 4.3 Scale";
     } else {
         gpaScale = '4.3';
-        document.getElementById('scale-toggle').innerText = "Switch to 4.0 Scale";
     }
+    document.getElementById('scale-toggle').innerText = gpaScale === '4.3' ? UI_TEXT[currentLanguage].scaleToggle40 : UI_TEXT[currentLanguage].scaleToggle43;
 
     courseData = parseCourseData(courseData.map(course => ({ ...course, points: undefined })));
     updateSummaryStatistics(courseData);
@@ -336,9 +364,13 @@ function updateInterfaceText() {
     document.getElementById('th-grade').innerText = text.tableHeaders.grade;
 
     const filterSemSelect = document.getElementById('filter-semester');
-    filterSemSelect.options[0].text = text.filters.allSemesters;
+    if (filterSemSelect.options.length > 0) {
+        filterSemSelect.options[0].text = text.filters.allSemesters;
+    }
     const filterCatSelect = document.getElementById('filter-category');
-    if (filterCatSelect) filterCatSelect.options[0].text = text.filters.allCategories;
+    if (filterCatSelect && filterCatSelect.options.length > 0) {
+        filterCatSelect.options[0].text = text.filters.allCategories;
+    }
 
     if (courseData.length > 0) {
         populateSemesterFilter();
@@ -346,6 +378,19 @@ function updateInterfaceText() {
     }
 
     document.getElementById('btn-reset-filters').innerText = text.filters.reset;
+    document.getElementById('scale-toggle').innerText = gpaScale === '4.3' ? text.scaleToggle40 : text.scaleToggle43;
+
+    const filteredStatsText = text.filteredStats;
+    if (filteredStatsText) {
+        const fsLabelCredits = document.getElementById('fs-label-credits');
+        if (fsLabelCredits) fsLabelCredits.innerText = filteredStatsText.credits;
+
+        const fsLabelGpa = document.getElementById('fs-label-gpa');
+        if (fsLabelGpa) fsLabelGpa.innerText = filteredStatsText.gpa;
+
+        const fsLabelMajor = document.getElementById('fs-label-major');
+        if (fsLabelMajor) fsLabelMajor.innerText = filteredStatsText.majorGpa;
+    }
 }
 
 function loadCourseData() {
@@ -415,7 +460,7 @@ function updateSummaryStatistics(data) {
     });
 
     const gpa43 = totalGpaCredits > 0 ? (totalPoints43 / totalGpaCredits) : 0;
-    const convertedScore = gpa43 > 0 ? (gpa43 * 10 + 57).toFixed(1) : "0.0";
+    const convertedScore = gpa43 > 0 ? (gpa43 * CONVERSION_SLOPE + CONVERSION_BASE).toFixed(1) : "0.0";
 
     const valConvertedElement = document.getElementById('val-converted-score');
     if (valConvertedElement) {
@@ -446,6 +491,28 @@ function animateValue(id, start, end, duration, suffix, isFloat = false) {
         }
     };
     window.requestAnimationFrame(step);
+}
+
+function updateFilteredStatistics(data) {
+    const totalCredits = d3.sum(data, course => course.numericCredits);
+
+    const gpaEligibleData = data.filter(course => course.validForGPA);
+    const totalGradePoints = d3.sum(gpaEligibleData, course => course.points * course.numericCredits);
+    const totalGpaCredits = d3.sum(gpaEligibleData, course => course.numericCredits);
+    const overallGPA = totalGpaCredits > 0 ? (Math.round((totalGradePoints / totalGpaCredits) * 100 + 0.00001) / 100).toFixed(2) : "-";
+
+    const majorCourses = gpaEligibleData.filter(course => course.isMajor);
+    const majorGradePoints = d3.sum(majorCourses, course => course.points * course.numericCredits);
+    const majorGpaCredits = d3.sum(majorCourses, course => course.numericCredits);
+    const majorGPA = majorGpaCredits > 0 ? (Math.round((majorGradePoints / majorGpaCredits) * 100 + 0.00001) / 100).toFixed(2) : "-";
+
+    const elCredits = document.getElementById('fs-val-credits');
+    const elGpa = document.getElementById('fs-val-gpa');
+    const elMajor = document.getElementById('fs-val-major');
+
+    if (elCredits) elCredits.textContent = totalCredits;
+    if (elGpa) elGpa.textContent = overallGPA;
+    if (elMajor) elMajor.textContent = majorGPA;
 }
 
 function renderAllCharts() {
@@ -522,7 +589,8 @@ function createPieChartSvg(containerId) {
 }
 
 function renderGpaTrendChart() {
-    const margin = { top: 20, right: 30, bottom: 40, left: 60 };
+    const isMobile = getIsMobile();
+    const margin = { top: 20, right: isMobile ? 10 : 30, bottom: 40, left: isMobile ? 40 : 60 };
     const { svg, chartWidth, chartHeight } = createChartSvg('line-chart', margin);
 
     const uniqueSemesters = Array.from(new Set(courseData.map(course => course.Semester)));
@@ -567,9 +635,22 @@ function renderGpaTrendChart() {
 
     svg.append('g')
         .attr('transform', `translate(0,${chartHeight})`)
-        .call(d3.axisBottom(xScale).tickFormat(d => getLocalizedSemesterName(d)))
+        .call(d3.axisBottom(xScale).tickFormat(d => {
+            if (isMobile) {
+                const [year, term] = d.split(' ');
+                const shortYear = year.slice(2);
+                let shortTerm = term;
+                if (term === '1st') shortTerm = '1';
+                else if (term === '2nd') shortTerm = '2';
+                else if (term === 'Summer') shortTerm = 'S';
+                else if (term === 'Winter') shortTerm = 'W';
+                return `${shortYear}-${shortTerm}`;
+            }
+            return getLocalizedSemesterName(d);
+        }))
         .selectAll("text")
         .style("text-anchor", "middle")
+        .style("font-size", isMobile ? "10px" : "12px")
         .attr("dx", "0")
         .attr("dy", "1em")
         .attr("transform", "rotate(0)");
@@ -588,7 +669,8 @@ function renderGpaTrendChart() {
         .style("stroke-dasharray", ("3, 3"))
         .style("opacity", 0.1);
 
-    svg.append('g').call(yAxis);
+    svg.append('g').call(yAxis)
+        .style("font-size", isMobile ? "10px" : "12px");
 
     const overallLine = d3.line()
         .defined(d => d.overallGPA !== null)
@@ -607,7 +689,7 @@ function renderGpaTrendChart() {
         .attr('class', 'line-overall')
         .attr('fill', 'none')
         .attr('stroke', CHART_COLORS.total)
-        .attr('stroke-width', 4)
+        .attr('stroke-width', isMobile ? 3 : 4)
         .attr('d', overallLine)
         .style('filter', 'drop-shadow(0px 4px 6px rgba(0, 58, 112, 0.2))')
         .style('transition', 'opacity 0.3s');
@@ -626,7 +708,7 @@ function renderGpaTrendChart() {
         .attr('class', 'line-major')
         .attr('fill', 'none')
         .attr('stroke', CHART_COLORS.major)
-        .attr('stroke-width', 4)
+        .attr('stroke-width', isMobile ? 3 : 4)
         .attr('d', majorLine)
         .style('filter', 'drop-shadow(0px 4px 6px rgba(100, 204, 201, 0.2))')
         .style('transition', 'opacity 0.3s');
@@ -666,20 +748,23 @@ function renderGpaTrendChart() {
             })
             .on('mouseout', function () {
                 if (d3.select(this).style('opacity') === '0.1') return;
-                d3.select(this).transition().duration(200).attr('r', 6);
+                d3.select(this).transition().duration(200).attr('r', isMobile ? 4 : 6);
                 hideChartTooltip();
             })
             .transition()
             .delay(1000)
             .duration(500)
-            .attr('r', 6);
+            .attr('r', isMobile ? 4 : 6);
     };
 
     drawDataPoints('overallGPA', CHART_COLORS.total, UI_TEXT[currentLanguage].overallGPA);
     drawDataPoints('majorGPA', CHART_COLORS.major, UI_TEXT[currentLanguage].majorGPA);
 
+    const legendX = isMobile ? chartWidth - 110 : chartWidth - 140;
+    const legendY = isMobile ? chartHeight - 50 : 0;
+
     const legend = svg.append('g')
-        .attr('transform', `translate(${chartWidth - 140}, 0)`);
+        .attr('transform', `translate(${legendX}, ${legendY})`);
 
     let focusedKey = null;
 
@@ -706,6 +791,9 @@ function renderGpaTrendChart() {
         }
     };
 
+    const legendFontSize = isMobile ? '12px' : '18px';
+    const legendGap = isMobile ? 20 : 30;
+
     const legendOverall = legend.append('g')
         .attr('id', 'legend-overall')
         .style('cursor', 'pointer')
@@ -714,14 +802,14 @@ function renderGpaTrendChart() {
         .on('mouseout', hideChartTooltip);
 
     legendOverall.append('rect')
-        .attr('x', 0).attr('y', 0).attr('width', 14).attr('height', 14)
+        .attr('x', 0).attr('y', 0).attr('width', isMobile ? 10 : 14).attr('height', isMobile ? 10 : 14)
         .attr('fill', CHART_COLORS.total)
         .attr('opacity', 0).transition().delay(500).duration(500).attr('opacity', 1);
 
     legendOverall.append('text')
-        .attr('x', 20).attr('y', 12)
+        .attr('x', isMobile ? 15 : 20).attr('y', isMobile ? 9 : 12)
         .text(UI_TEXT[currentLanguage].overallGPA)
-        .style('font-size', '18px')
+        .style('font-size', legendFontSize)
         .attr('opacity', 0).transition().delay(500).duration(500).attr('opacity', 1);
 
     const legendMajor = legend.append('g')
@@ -732,21 +820,22 @@ function renderGpaTrendChart() {
         .on('mouseout', hideChartTooltip);
 
     legendMajor.append('rect')
-        .attr('x', 0).attr('y', 30).attr('width', 14).attr('height', 14)
+        .attr('x', 0).attr('y', legendGap).attr('width', isMobile ? 10 : 14).attr('height', isMobile ? 10 : 14)
         .attr('fill', CHART_COLORS.major)
         .attr('opacity', 0).transition().delay(500).duration(500).attr('opacity', 1);
 
     legendMajor.append('text')
-        .attr('x', 20).attr('y', 42)
+        .attr('x', isMobile ? 15 : 20).attr('y', legendGap + (isMobile ? 9 : 12))
         .text(UI_TEXT[currentLanguage].majorGPA)
-        .style('font-size', '18px')
+        .style('font-size', legendFontSize)
         .attr('opacity', 0).transition().delay(500).duration(500).attr('opacity', 1);
 }
 
 function renderGradeDistributionChart() {
     const { svg, radius } = createPieChartSvg('pie-chart');
 
-    const gradeCounts = d3.rollup(courseData, v => v.length, d => d.Grade);
+    const validData = courseData.filter(d => d.Grade !== 'AU');
+    const gradeCounts = d3.rollup(validData, v => d3.sum(v, d => d.numericCredits), d => d.Grade);
     const pieData = Array.from(gradeCounts, ([grade, count]) => ({ grade, count }))
         .filter(d => d.grade && d.grade !== '');
 
@@ -823,7 +912,7 @@ function renderGradeDistributionChart() {
             const percent = ((d.endAngle - d.startAngle) / (2 * Math.PI) * 100).toFixed(1);
             const html = `
                 <strong>${d.data.grade}</strong><br/>
-                ${text.count}: ${d.data.count}<br/>
+                ${text.credits}: ${d.data.count}<br/>
                 ${percent}%<br/>
                 <span style="font-size: 0.8em; color: #ddd;">${text.filterHint}</span>
             `;
@@ -854,10 +943,11 @@ function renderGradeDistributionChart() {
 function renderCourseCodeDistributionChart() {
     const { svg, radius } = createPieChartSvg('code-chart');
 
-    const codeGroups = d3.group(courseData, course => course.codePrefix);
+    const validData = courseData.filter(d => d.Grade !== 'AU');
+    const codeGroups = d3.group(validData, course => course.codePrefix);
     const pieData = Array.from(codeGroups, ([prefix, courses]) => ({
         prefix,
-        count: courses.length,
+        count: d3.sum(courses, c => c.numericCredits),
         courses: courses
     })).filter(d => d.prefix && d.prefix !== '');
 
@@ -930,7 +1020,7 @@ function renderCourseCodeDistributionChart() {
             const html = `
                 <div style="text-align: center;">
                     <strong>${d.data.prefix}</strong><br/>
-                    ${text.count}: ${d.data.count}<br/>
+                    ${text.credits}: ${d.data.count}<br/>
                     ${percent}%<br/>
                     <span style="font-size: 0.8em; color: #ddd;">${text.filterHint}</span>
                 </div>
@@ -960,7 +1050,8 @@ function renderCourseCodeDistributionChart() {
 }
 
 function renderCreditsBySemesterChart() {
-    const margin = { top: 20, right: 30, bottom: 40, left: 60 };
+    const isMobile = getIsMobile();
+    const margin = { top: 20, right: isMobile ? 10 : 30, bottom: 40, left: isMobile ? 40 : 60 };
     const { svg, chartWidth, chartHeight } = createChartSvg('bar-chart', margin);
 
     const uniqueSemesters = Array.from(new Set(courseData.map(course => course.Semester)));
@@ -985,9 +1076,22 @@ function renderCreditsBySemesterChart() {
 
     svg.append('g')
         .attr('transform', `translate(0,${chartHeight})`)
-        .call(d3.axisBottom(xScale).tickFormat(d => getLocalizedSemesterName(d)))
+        .call(d3.axisBottom(xScale).tickFormat(d => {
+            if (isMobile) {
+                const [year, term] = d.split(' ');
+                const shortYear = year.slice(2);
+                let shortTerm = term;
+                if (term === '1st') shortTerm = '1';
+                else if (term === '2nd') shortTerm = '2';
+                else if (term === 'Summer') shortTerm = 'S';
+                else if (term === 'Winter') shortTerm = 'W';
+                return `${shortYear}-${shortTerm}`;
+            }
+            return getLocalizedSemesterName(d);
+        }))
         .selectAll("text")
         .style("text-anchor", "middle")
+        .style("font-size", isMobile ? "10px" : "12px")
         .attr("dx", "0")
         .attr("dy", "1em")
         .attr("transform", "rotate(0)");
@@ -1001,7 +1105,8 @@ function renderCreditsBySemesterChart() {
         .style("stroke-dasharray", ("3, 3"))
         .style("opacity", 0.1);
 
-    svg.append('g').call(d3.axisLeft(yScale));
+    svg.append('g').call(d3.axisLeft(yScale))
+        .style("font-size", isMobile ? "10px" : "12px");
 
     svg.selectAll(".bar")
         .data(chartData)
@@ -1083,6 +1188,9 @@ function renderCourseTable() {
 
         return true;
     });
+
+    updateFilteredStatistics(filteredData);
+
 
     if (filteredData.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="no-results">${UI_TEXT[currentLanguage].noResults}</td></tr>`;
