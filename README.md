@@ -30,5 +30,4 @@ To use this dashboard for your own academic records, simply modify `courses.csv`
 ## Tech Stack
 
 - **Core**: HTML5, CSS3, Vanilla JavaScript (ES6+)
-
 - **Visualization**: D3.js (v7)

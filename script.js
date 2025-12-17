@@ -30,7 +30,8 @@ const UI_TEXT = {
             reset: "Reset"
         },
         legendHint: "Click to focus",
-        filterHint: "Click to filter table"
+        filterHint: "Click to filter table",
+        noResults: "No courses found matching your criteria."
     },
     ko: {
         title: "성적 대시보드",
@@ -63,7 +64,8 @@ const UI_TEXT = {
             reset: "초기화"
         },
         legendHint: "클릭하여 이 그래프만 강조",
-        filterHint: "클릭하여 테이블 필터링"
+        filterHint: "클릭하여 테이블 필터링",
+        noResults: "조건에 맞는 강의가 없습니다."
     }
 };
 
@@ -159,6 +161,19 @@ function getLocalizedCategoryName(category) {
     return CATEGORY_KO[category] || category;
 }
 
+function sortSemesters(semesters) {
+    return semesters.sort((a, b) => {
+        const [yearA, termA] = a.split(' ');
+        const [yearB, termB] = b.split(' ');
+        if (yearA !== yearB) return yearA - yearB;
+        return SEMESTER_ORDER[termA] - SEMESTER_ORDER[termB];
+    });
+}
+
+function isRegularSemester(semester) {
+    return !semester.includes('Summer') && !semester.includes('Winter');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     loadCourseData();
     initializeEventListeners();
@@ -233,12 +248,7 @@ function initializeEventListeners() {
 
 function populateSemesterFilter() {
     const uniqueSemesters = Array.from(new Set(courseData.map(course => course.Semester)));
-    uniqueSemesters.sort((a, b) => {
-        const [yearA, termA] = a.split(' ');
-        const [yearB, termB] = b.split(' ');
-        if (yearA !== yearB) return yearA - yearB;
-        return SEMESTER_ORDER[termA] - SEMESTER_ORDER[termB];
-    });
+    sortSemesters(uniqueSemesters);
 
     const select = document.getElementById('filter-semester');
     const firstOption = select.options[0];
@@ -516,14 +526,9 @@ function renderGpaTrendChart() {
     const { svg, chartWidth, chartHeight } = createChartSvg('line-chart', margin);
 
     const uniqueSemesters = Array.from(new Set(courseData.map(course => course.Semester)));
-    uniqueSemesters.sort((a, b) => {
-        const [yearA, termA] = a.split(' ');
-        const [yearB, termB] = b.split(' ');
-        if (yearA !== yearB) return yearA - yearB;
-        return SEMESTER_ORDER[termA] - SEMESTER_ORDER[termB];
-    });
+    sortSemesters(uniqueSemesters);
 
-    const semestersToDisplay = uniqueSemesters;
+    const semestersToDisplay = uniqueSemesters.filter(isRegularSemester);
 
     const trendData = semestersToDisplay.map(semester => {
         const semesterCourses = courseData.filter(course => course.Semester === semester && course.validForGPA);
@@ -959,14 +964,9 @@ function renderCreditsBySemesterChart() {
     const { svg, chartWidth, chartHeight } = createChartSvg('bar-chart', margin);
 
     const uniqueSemesters = Array.from(new Set(courseData.map(course => course.Semester)));
-    uniqueSemesters.sort((a, b) => {
-        const [yearA, termA] = a.split(' ');
-        const [yearB, termB] = b.split(' ');
-        if (yearA !== yearB) return yearA - yearB;
-        return SEMESTER_ORDER[termA] - SEMESTER_ORDER[termB];
-    });
+    sortSemesters(uniqueSemesters);
 
-    const semestersToDisplay = uniqueSemesters;
+    const semestersToDisplay = uniqueSemesters.filter(isRegularSemester);
 
     const chartData = semestersToDisplay.map(semester => {
         const semesterCourses = courseData.filter(course => course.Semester === semester);
@@ -1085,7 +1085,7 @@ function renderCourseTable() {
     });
 
     if (filteredData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="no-results">No courses found matching your criteria.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="no-results">${UI_TEXT[currentLanguage].noResults}</td></tr>`;
         return;
     }
 
