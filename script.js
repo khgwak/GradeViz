@@ -9,7 +9,7 @@ const UI_TEXT = {
         gradeDist: "Grade Distribution",
         codeDist: "Course Code Distribution",
         creditsPerSem: "Credits by Semester",
-        toggleBtn: "한글",
+        toggleBtn: "🌐 한국어로 전환",
         semester: "Semester",
         gpa: "GPA",
         count: "Count",
@@ -37,8 +37,8 @@ const UI_TEXT = {
             gpa: "Filtered GPA",
             majorGpa: "Filtered Major GPA"
         },
-        scaleToggle40: "Switch to 4.0 Scale",
-        scaleToggle43: "Switch to 4.3 Scale"
+        scaleToggle40: "🔄 Switch to 4.0 Scale",
+        scaleToggle43: "🔄 Switch to 4.3 Scale"
     },
     ko: {
         title: "성적 대시보드",
@@ -50,7 +50,7 @@ const UI_TEXT = {
         gradeDist: "성적 분포",
         codeDist: "과목 코드 분포",
         creditsPerSem: "학기별 이수학점",
-        toggleBtn: "English",
+        toggleBtn: "🌐 Switch to English",
         semester: "학기",
         gpa: "평점",
         count: "개수",
@@ -78,8 +78,8 @@ const UI_TEXT = {
             gpa: "필터된 평점평균",
             majorGpa: "필터된 전공 평점평균"
         },
-        scaleToggle40: "4.0 만점으로 전환",
-        scaleToggle43: "4.3 만점으로 전환"
+        scaleToggle40: "🔄 4.0 만점으로 변환",
+        scaleToggle43: "🔄 4.3 만점으로 변환"
     }
 };
 
@@ -761,7 +761,7 @@ function renderGpaTrendChart() {
     drawDataPoints('majorGPA', CHART_COLORS.major, UI_TEXT[currentLanguage].majorGPA);
 
     const legendX = isMobile ? chartWidth - 110 : chartWidth - 140;
-    const legendY = isMobile ? chartHeight - 50 : 0;
+    const legendY = 0;
 
     const legend = svg.append('g')
         .attr('transform', `translate(${legendX}, ${legendY})`);
